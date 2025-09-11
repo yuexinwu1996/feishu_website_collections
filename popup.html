@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>保存到飞书</title>
+    <link rel="stylesheet" href="css/popup.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🚀 保存到飞书</h1>
+        </header>
+
+        <div class="content">
+            <!-- 快速保存区域 -->
+            <div class="quick-save">
+                <div class="url-info">
+                    <div class="url-title" id="pageTitle">加载中...</div>
+                    <div class="url-link" id="pageUrl">加载中...</div>
+                </div>
+                <button class="btn btn-primary btn-quick-save" id="quickSaveBtn">
+                    <span class="btn-text">快速保存</span>
+                    <span class="btn-loading" style="display: none;">保存中...</span>
+                </button>
+            </div>
+
+            <!-- 详细设置区域 -->
+            <div class="detailed-form" id="detailedForm" style="display: none;">
+                <div class="form-group">
+                    <label for="titleInput">标题</label>
+                    <input type="text" id="titleInput" class="form-input" placeholder="页面标题">
+                </div>
+
+                <div class="form-group">
+                    <label for="notesInput">备注</label>
+                    <textarea id="notesInput" class="form-textarea" placeholder="添加备注信息..." rows="3"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="tagsInput">分类标签</label>
+                    <input type="text" id="tagsInput" class="form-input" placeholder="用逗号分隔多个标签">
+                    <div class="tags-container" id="tagsContainer"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="projectInput">关联项目</label>
+                    <input type="text" id="projectInput" class="form-input" placeholder="用逗号分隔多个项目">
+                    <div class="projects-container" id="projectsContainer"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="attachmentInput">关联文件</label>
+                    <input type="file" id="attachmentInput" class="form-input" multiple accept="*/*">
+                    <div class="attachments-container" id="attachmentsContainer"></div>
+                </div>
+
+                <div class="form-actions">
+                    <button class="btn btn-secondary" id="cancelBtn">取消</button>
+                    <button class="btn btn-primary" id="saveBtn">
+                        <span class="btn-text">保存</span>
+                        <span class="btn-loading" style="display: none;">保存中...</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 切换按钮 -->
+            <div class="toggle-section">
+                <button class="btn btn-link" id="toggleFormBtn">详细设置</button>
+                <button class="btn btn-link" id="openOptionsBtn">扩展设置</button>
+            </div>
+
+            <!-- 状态信息 -->
+            <div class="status-info" id="statusInfo" style="display: none;">
+                <div class="status-text" id="statusText"></div>
+            </div>
+
+            <!-- 最近保存 -->
+            <div class="recent-saves" id="recentSaves" style="display: none;">
+                <h3>最近保存</h3>
+                <div class="recent-list" id="recentList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>飞书网页收藏助手 - 设置</title>
+    <link rel="stylesheet" href="css/options.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🚀 飞书网页收藏助手</h1>
+            <p>配置您的飞书API设置</p>
+        </header>
+
+        <main class="main-content">
+            <!-- API配置区域 -->
+            <section class="config-section">
+                <h2>🔧 API 配置</h2>
+                <div class="config-form">
+                    <div class="form-group">
+                        <label for="proxyUrl">
+                            <span class="label-text">代理服务器地址</span>
+                            <span class="label-required">*</span>
+                        </label>
+                        <input type="url" id="proxyUrl" class="form-input" 
+                               placeholder="https://your-proxy-domain.com/" 
+                               title="用于代理飞书API请求的服务器地址">
+                        <div class="field-help">
+                            示例: https://your-proxy-domain.com/
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="appId">
+                            <span class="label-text">应用 ID (App ID)</span>
+                            <span class="label-required">*</span>
+                        </label>
+                        <input type="text" id="appId" class="form-input" 
+                               placeholder="cli_xxxxxxxxxx" 
+                               title="飞书应用的唯一标识符">
+                        <div class="field-help">
+                            在飞书开发者后台获取的应用 ID
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="appSecret">
+                            <span class="label-text">应用密钥 (App Secret)</span>
+                            <span class="label-required">*</span>
+                        </label>
+                        <input type="password" id="appSecret" class="form-input" 
+                               placeholder="xxxxxxxxxxxxxxxxxx" 
+                               title="飞书应用的密钥">
+                        <div class="field-help">
+                            在飞书开发者后台获取的应用密钥
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tableId">
+                            <span class="label-text">多维表格 ID</span>
+                            <span class="label-required">*</span>
+                        </label>
+                        <input type="text" id="tableId" class="form-input" 
+                               placeholder="tblxxxxxxxxxx" 
+                               title="用于存储网页收藏的多维表格ID">
+                        <div class="field-help">
+                            多维表格的唯一标识符，可从表格URL中获取
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tenantAccessToken">
+                            <span class="label-text">租户访问令牌</span>
+                            <span class="label-required">*</span>
+                        </label>
+                        <input type="password" id="tenantAccessToken" class="form-input" 
+                               placeholder="t-xxxxxxxxxxxxxxxxxx" 
+                               title="用于访问飞书API的令牌">
+                        <div class="field-help">
+                            使用应用凭证获取的租户访问令牌
+                        </div>
+                    </div>
+                </div>
+
+                <div class="config-actions">
+                    <button class="btn btn-secondary" id="testConnectionBtn">
+                        <span class="btn-text">测试连接</span>
+                        <span class="btn-loading" style="display: none;">测试中...</span>
+                    </button>
+                    <button class="btn btn-primary" id="saveConfigBtn">
+                        <span class="btn-text">保存配置</span>
+                        <span class="btn-loading" style="display: none;">保存中...</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- 使用说明区域 -->
+            <section class="help-section">
+                <h2>📖 配置说明</h2>
+                <div class="help-content">
+                    <div class="help-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <h3>创建飞书应用</h3>
+                            <p>在飞书开发者后台创建自建应用，获取 App ID 和 App Secret</p>
+                            <a href="https://open.feishu.cn/app" target="_blank" class="help-link">
+                                前往飞书开发者后台 →
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="help-step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <h3>获取访问令牌</h3>
+                            <p>使用应用凭证调用API获取 tenant_access_token</p>
+                            <div class="code-block">
+                                <pre><code>POST https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal
+{
+  "app_id": "your_app_id",
+  "app_secret": "your_app_secret"
+}</code></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="help-step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <h3>创建多维表格</h3>
+                            <p>创建用于存储网页收藏的多维表格，设置以下字段：</p>
+                            <ul class="field-list">
+                                <li><strong>url</strong> - 单行文本（网站地址）</li>
+                                <li><strong>title</strong> - 单行文本（页面标题）</li>
+                                <li><strong>notes</strong> - 多行文本（备注）</li>
+                                <li><strong>tags</strong> - 多选（标签）</li>
+                                <li><strong>project</strong> - 单选（项目分类）</li>
+                                <li><strong>created_time</strong> - 日期时间（创建时间）</li>
+                                <li><strong>last_updated</strong> - 日期时间（最后更新）</li>
+                                <li><strong>url_hash</strong> - 单行文本（URL哈希，用于去重）</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="help-step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <h3>设置代理服务器</h3>
+                            <p>配置后端代理服务器地址，用于处理飞书API调用</p>
+                            <div class="warning-box">
+                                <strong>注意：</strong> 需要设置支持CORS的代理服务器，用于转发飞书API请求
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 权限说明区域 -->
+            <section class="permissions-section">
+                <h2>🔒 权限说明</h2>
+                <div class="permissions-list">
+                    <div class="permission-item">
+                        <span class="permission-name">storage</span>
+                        <span class="permission-desc">存储配置信息和离线数据</span>
+                    </div>
+                    <div class="permission-item">
+                        <span class="permission-name">tabs</span>
+                        <span class="permission-desc">获取当前标签页信息</span>
+                    </div>
+                    <div class="permission-item">
+                        <span class="permission-name">contextMenus</span>
+                        <span class="permission-desc">添加右键菜单选项</span>
+                    </div>
+                    <div class="permission-item">
+                        <span class="permission-name">notifications</span>
+                        <span class="permission-desc">显示保存状态通知</span>
+                    </div>
+                    <div class="permission-item">
+                        <span class="permission-name">alarms</span>
+                        <span class="permission-desc">定时处理离线队列</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 状态信息区域 -->
+            <div class="status-info" id="statusInfo" style="display: none;">
+                <div class="status-text" id="statusText"></div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>飞书网页收藏助手 v1.0</p>
+            <p>
+                <a href="#" id="resetConfigBtn">重置配置</a> | 
+                <a href="#" id="exportConfigBtn">导出配置</a> | 
+                <a href="#" id="importConfigBtn">导入配置</a>
+            </p>
+        </footer>
+    </div>
+
+    <input type="file" id="importFileInput" style="display: none;" accept=".json">
+    <script src="js/options.js"></script>
+</body>
+</html>
