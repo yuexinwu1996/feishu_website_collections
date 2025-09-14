@@ -1,0 +1,26 @@
+{
+  "name": "feishu-website-collections-proxy",
+  "version": "1.0.0",
+  "description": "Proxy server for Feishu Website Collections Chrome Extension",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "node-fetch": "^2.7.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "keywords": [
+    "feishu",
+    "chrome-extension",
+    "proxy",
+    "cors"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}

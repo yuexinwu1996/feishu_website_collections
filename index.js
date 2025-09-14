@@ -47,6 +47,20 @@ app.use('/bitable/*', async (req, res) => {
   }
 });
 
+// 根路径处理
+app.get('/', (req, res) => {
+  res.json({ 
+    name: '飞书网页收藏助手代理服务器',
+    version: '1.0.0',
+    status: 'running',
+    endpoints: {
+      health: '/health',
+      proxy: '/bitable/*'
+    },
+    timestamp: new Date().toISOString()
+  });
+});
+
 // 健康检查
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
