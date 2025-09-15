@@ -17,7 +17,7 @@ app.use(cors({
 app.use(express.json());
 
 // 飞书API代理路由
-app.use('/bitable/*', async (req, res) => {
+app.use('/bitable', async (req, res) => {
   try {
     const feishuUrl = `https://open.feishu.cn/open-apis${req.path}`;
     
