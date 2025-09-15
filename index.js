@@ -19,7 +19,9 @@ app.use(express.json());
 // 飞书API代理路由
 app.use('/bitable', async (req, res) => {
   try {
-    const feishuUrl = `https://open.feishu.cn/open-apis${req.path}`;
+    // 移除/bitable前缀，构建正确的API URL
+    const apiPath = req.path.startsWith('/bitable') ? req.path : `/bitable${req.path}`;
+    const feishuUrl = `https://open.feishu.cn/open-apis${apiPath}`;
     
     const options = {
       method: req.method,
