@@ -1,5 +1,5 @@
 // 获取飞书访问令牌的脚本
-// 使用方法：node get-token.js
+// 使用方法：node get-token.js your_app_id your_app_secret
 
 const fetch = require('node-fetch');
 
@@ -35,25 +35,28 @@ async function getTenantAccessToken(appId, appSecret) {
   }
 }
 
-// 使用示例
-const APP_ID = 'cli_xxxxxxxxxx';     // 替换为您的App ID
-const APP_SECRET = 'xxxxxxxxxx';     // 替换为您的App Secret
+// 从命令行参数获取凭证
+const args = process.argv.slice(2);
+const APP_ID = args[0];
+const APP_SECRET = args[1];
 
-if (APP_ID.startsWith('cli_') && APP_SECRET.length > 10) {
+if (APP_ID && APP_SECRET) {
+  console.log('🔄 正在获取租户访问令牌...');
   getTenantAccessToken(APP_ID, APP_SECRET);
 } else {
-  console.log('请先配置正确的APP_ID和APP_SECRET');
-  console.log('修改本文件第29-30行，填入您的应用凭证');
+  console.log('❌ 请提供App ID和App Secret');
+  console.log('使用方法: node get-token.js <app_id> <app_secret>');
+  console.log('');
+  console.log('示例: node get-token.js cli_a1234567890abcdef your_app_secret');
+  console.log('');
+  console.log('💡 提示:');
+  console.log('1. 访问 https://open.feishu.cn/app 创建应用');
+  console.log('2. 在应用详情页获取 App ID 和 App Secret');
+  console.log('3. 确保应用已添加 bitable:app 权限');
 }
 
-// 或者使用curl命令：
-console.log('\n也可以使用curl命令获取：');
-console.log(`curl -X POST "https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal" \\
--H "Content-Type: application/json" \\
--d '{
-  "app_id": "${APP_ID}",
-  "app_secret": "${APP_SECRET}"
-}'`);
+// 导出函数供其他模块使用
+module.exports = { getTenantAccessToken };
 
 // 注意：
 // 1. tenant_access_token 有效期为2小时

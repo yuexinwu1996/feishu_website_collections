@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>生成扩展图标</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        canvas { border: 1px solid #ccc; margin: 10px; }
+        .icon-container { display: inline-block; text-align: center; margin: 10px; }
+        button { padding: 10px 20px; font-size: 16px; margin: 10px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>飞书网页收藏助手 - 图标生成器</h1>
+    <p>点击下面的按钮生成并下载各尺寸的图标文件：</p>
+    
+    <div id="canvases"></div>
+    <br>
+    <button onclick="generateAndDownloadIcons()">生成并下载所有图标</button>
+
+    <script>
+        const sizes = [16, 32, 48, 128];
+        
+        function createIcon(size) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            
+            // 背景渐变 (飞书蓝色)
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#667eea');
+            gradient.addColorStop(1, '#764ba2');
+            
+            // 圆形背景
+            ctx.beginPath();
+            ctx.arc(size/2, size/2, size/2 - 2, 0, Math.PI * 2);
+            ctx.fillStyle = gradient;
+            ctx.fill();
+            
+            // 白色书签图标
+            ctx.fillStyle = '#ffffff';
+            const iconSize = size * 0.6;
+            const x = (size - iconSize) / 2;
+            const y = (size - iconSize) / 2;
+            
+            // 书签形状
+            ctx.beginPath();
+            ctx.moveTo(x + iconSize * 0.2, y + iconSize * 0.1);
+            ctx.lineTo(x + iconSize * 0.8, y + iconSize * 0.1);
+            ctx.lineTo(x + iconSize * 0.8, y + iconSize * 0.9);
+            ctx.lineTo(x + iconSize * 0.5, y + iconSize * 0.7);
+            ctx.lineTo(x + iconSize * 0.2, y + iconSize * 0.9);
+            ctx.closePath();
+            ctx.fill();
+            
+            // 添加 "+" 符号表示收藏
+            if (size >= 32) {
+                const plusSize = size * 0.15;
+                const plusX = x + iconSize * 0.75;
+                const plusY = y + iconSize * 0.25;
+                
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(plusX - plusSize/6, plusY - plusSize/2, plusSize/3, plusSize);
+                ctx.fillRect(plusX - plusSize/2, plusY - plusSize/6, plusSize, plusSize/3);
+                
+                // 绿色圆形背景
+                ctx.beginPath();
+                ctx.arc(plusX, plusY, plusSize * 0.6, 0, Math.PI * 2);
+                ctx.fillStyle = '#00c853';
+                ctx.fill();
+                
+                // 白色 "+" 号
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(plusX - plusSize/6, plusY - plusSize/2, plusSize/3, plusSize);
+                ctx.fillRect(plusX - plusSize/2, plusY - plusSize/6, plusSize, plusSize/3);
+            }
+            
+            return canvas;
+        }
+        
+        function generateAndDownloadIcons() {
+            sizes.forEach(size => {
+                const canvas = createIcon(size);
+                
+                // 转换为blob并下载
+                canvas.toBlob(blob => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `icon${size}.png`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 'image/png');
+            });
+        }
+        
+        // 显示预览
+        function showPreviews() {
+            const container = document.getElementById('canvases');
+            sizes.forEach(size => {
+                const div = document.createElement('div');
+                div.className = 'icon-container';
+                
+                const canvas = createIcon(size);
+                const label = document.createElement('div');
+                label.textContent = `${size}x${size}px`;
+                
+                div.appendChild(canvas);
+                div.appendChild(label);
+                container.appendChild(div);
+            });
+        }
+        
+        showPreviews();
+    </script>
+</body>
+</html>

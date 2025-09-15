@@ -8,7 +8,9 @@ const PORT = process.env.PORT || 3000;
 
 // 启用CORS
 app.use(cors({
-  origin: ['chrome-extension://*', 'https://open.feishu.cn'],
+  origin: true,  // 允许所有源，包括Chrome扩展
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   credentials: true
 }));
 

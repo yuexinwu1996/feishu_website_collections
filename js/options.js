@@ -225,7 +225,7 @@ class OptionsManager {
 
     async testApiConnection(config) {
         try {
-            const url = `${config.proxyUrl}/bitable/v1/apps/${config.appId}/tables/${config.tableId}/fields`;
+            const url = `${config.proxyUrl.replace(/\/+$/, '')}/bitable/v1/apps/${config.appId}/tables/${config.tableId}/fields`;
             
             const response = await fetch(url, {
                 method: 'GET',
