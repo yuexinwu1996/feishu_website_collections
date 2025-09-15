@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>测试表格ID验证</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-item { margin: 10px 0; padding: 10px; border: 1px solid #ccc; }
+        .valid { background-color: #e8f5e8; border-color: #4caf50; }
+        .invalid { background-color: #ffeaea; border-color: #f44336; }
+    </style>
+</head>
+<body>
+    <h1>表格ID验证测试</h1>
+    
+    <div id="results"></div>
+    
+    <script>
+        function validateTableId(tableId) {
+            // 模拟扩展中的验证逻辑
+            return tableId.startsWith('tbl') || tableId.includes('_tbl');
+        }
+        
+        const testCases = [
+            'tbl7vzCQ8ZlUj31j',  // 原格式
+            'VvSKb64KfasdYjsJoK9cgE3JnP9_tbl7vzCQ8ZlUj31j',  // 新格式
+            'invalid_format',  // 无效格式
+            'tblABCDEF',  // 有效的tbl开头
+            'appToken_tblXYZ'  // 有效的_tbl格式
+        ];
+        
+        const results = document.getElementById('results');
+        
+        testCases.forEach(testCase => {
+            const isValid = validateTableId(testCase);
+            const div = document.createElement('div');
+            div.className = `test-item ${isValid ? 'valid' : 'invalid'}`;
+            div.innerHTML = `
+                <strong>${testCase}</strong><br>
+                结果: ${isValid ? '✅ 有效' : '❌ 无效'}
+            `;
+            results.appendChild(div);
+        });
+    </script>
+</body>
+</html>
