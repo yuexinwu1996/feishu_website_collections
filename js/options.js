@@ -183,7 +183,8 @@ class OptionsManager {
             return false;
         }
 
-        if (!data.tableId.startsWith('tbl')) {
+        // 支持两种格式: tbl开头 或 appToken_tbl格式
+        if (!data.tableId.startsWith('tbl') && !data.tableId.includes('_tbl')) {
             document.getElementById('tableId').focus();
             return false;
         }
@@ -225,7 +226,10 @@ class OptionsManager {
 
     async testApiConnection(config) {
         try {
-            const url = `${config.proxyUrl.replace(/\/+$/, '')}/bitable/v1/apps/${config.appId}/tables/${config.tableId}/fields`;
+            // 从表格ID提取App Token (表格ID格式: appToken_tableId)
+            const appToken = config.tableId.includes('_') ? config.tableId.split('_')[0] : config.appId;
+            const tableId = config.tableId.includes('_') ? config.tableId.split('_').slice(1).join('_') : config.tableId;
+            const url = `${config.proxyUrl.replace(/\/+$/, '')}/bitable/v1/apps/${appToken}/tables/${tableId}/fields`;
             
             const response = await fetch(url, {
                 method: 'GET',
