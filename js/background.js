@@ -157,25 +157,32 @@ class FeishuBookmarkExtension {
   }
 
   async handleSaveBookmark(data, sendResponse) {
+    console.log('[DEBUG] 开始保存书签:', data);
+    const bookmarkData = {
+      ...data,
+      url: this.normalizeUrl(data.url),
+      createdTime: new Date().toISOString(),
+      lastUpdated: new Date().toISOString()
+    };
+    
     try {
-      const bookmarkData = {
-        ...data,
-        url: this.normalizeUrl(data.url),
-        createdTime: new Date().toISOString(),
-        lastUpdated: new Date().toISOString()
-      };
+      console.log('[DEBUG] 处理后的书签数据:', bookmarkData);
 
       const isDuplicate = await this.checkDuplicate(bookmarkData.url);
       if (isDuplicate) {
+        console.log('[DEBUG] 检测到重复URL:', bookmarkData.url);
         sendResponse({ success: false, error: 'URL已存在' });
         return;
       }
 
+      console.log('[DEBUG] 开始调用飞书API保存');
       await this.saveToFeishu(bookmarkData);
+      console.log('[DEBUG] 飞书API保存成功');
       sendResponse({ success: true });
     } catch (error) {
-      console.error('保存失败:', error);
-      await this.addToOfflineQueue(data);
+      console.error('[DEBUG] 保存失败:', error);
+      await this.addToOfflineQueue(bookmarkData);
+      console.log('[DEBUG] 已添加到离线队列');
       sendResponse({ success: true, offline: true });
     }
   }
@@ -223,7 +230,9 @@ class FeishuBookmarkExtension {
     
     try {
       const response = await this.makeApiCall('POST', '/bitable/v1/apps/{appToken}/tables/{tableId}/records/search', {
+        fields: ['record_id', 'url_hash'],
         filter: {
+          conjunction: 'and',
           conditions: [
             {
               field_name: 'url_hash',
@@ -254,17 +263,27 @@ class FeishuBookmarkExtension {
       }
     }
 
+    const urlHash = await this.generateUrlHash(bookmarkData.url);
+    console.log('[DEBUG] 生成的字段数据:', {
+      url: bookmarkData.url,
+      title: bookmarkData.title,
+      notes: bookmarkData.notes,
+      tags: bookmarkData.tags,
+      project: bookmarkData.project,
+      urlHash
+    });
+
     const record = {
       fields: {
-        网页链接: bookmarkData.url,
-        网站标题: bookmarkData.title,
-        备注: bookmarkData.notes || '',
-        分类标签: bookmarkData.tags || [],
-        关联项目: Array.isArray(bookmarkData.project) ? bookmarkData.project : (bookmarkData.project ? [bookmarkData.project] : []),
-        关联文件: uploadedFiles,
-        创建时间: bookmarkData.createdTime,
-        最后更新时间: bookmarkData.lastUpdated,
-        url_hash: await this.generateUrlHash(bookmarkData.url)
+        "网页链接": bookmarkData.url,
+        "网站标题": bookmarkData.title,
+        "备注": bookmarkData.notes || '',
+        "分类标签": bookmarkData.tags || [],
+        "关联项目": Array.isArray(bookmarkData.project) ? bookmarkData.project : (bookmarkData.project ? [bookmarkData.project] : []),
+        "关联文件": uploadedFiles,
+        "创建时间": bookmarkData.createdTime,
+        "最后更新时间": bookmarkData.lastUpdated,
+        "url_hash": urlHash
       }
     };
 
@@ -333,12 +352,20 @@ class FeishuBookmarkExtension {
 
   async makeApiCall(method, endpoint, data = null) {
     if (!this.apiConfig.proxyUrl || !this.apiConfig.tenantAccessToken) {
+      console.error('[DEBUG] API配置不完整:', {
+        proxyUrl: !!this.apiConfig.proxyUrl,
+        tenantAccessToken: !!this.apiConfig.tenantAccessToken,
+        appId: !!this.apiConfig.appId,
+        tableId: !!this.apiConfig.tableId
+      });
       throw new Error('API配置不完整');
     }
 
     const url = `${this.apiConfig.proxyUrl}${endpoint}`
       .replace('{appToken}', this.apiConfig.appId)
       .replace('{tableId}', this.apiConfig.tableId);
+
+    console.log('[DEBUG] API调用:', { method, url, data });
 
     const options = {
       method,
@@ -356,10 +383,13 @@ class FeishuBookmarkExtension {
     
     if (!response.ok) {
       const errorText = await response.text();
+      console.error('[DEBUG] API调用失败:', { status: response.status, errorText });
       throw new Error(`API调用失败: ${response.status} ${errorText}`);
     }
 
-    return await response.json();
+    const result = await response.json();
+    console.log('[DEBUG] API调用成功:', result);
+    return result;
   }
 
   async addToOfflineQueue(bookmarkData) {
@@ -430,12 +460,13 @@ class FeishuBookmarkExtension {
       }
 
       const searchParams = {
+        fields: ['record_id', '网页链接', '网站标题', '备注', '分类标签', '关联项目', '创建时间', '最后更新时间'],
         page_size: pageSize,
         page_token: page > 1 ? ((page - 1) * pageSize).toString() : undefined
       };
 
       if (conditions.length > 0) {
-        searchParams.filter = { conditions };
+        searchParams.filter = { conjunction: 'and', conditions };
       }
 
       const response = await this.makeApiCall('POST', '/bitable/v1/apps/{appToken}/tables/{tableId}/records/search', searchParams);
