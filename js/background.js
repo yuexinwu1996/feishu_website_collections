@@ -226,18 +226,16 @@ class FeishuBookmarkExtension {
   }
 
   async checkDuplicate(url) {
-    const urlHash = await this.generateUrlHash(url);
-    
     try {
       const response = await this.makeApiCall('POST', '/bitable/v1/apps/{appToken}/tables/{tableId}/records/search', {
-        fields: ['record_id', 'url_hash'],
+        fields: ['record_id', '网页链接'],
         filter: {
           conjunction: 'and',
           conditions: [
             {
-              field_name: 'url_hash',
+              field_name: '网页链接',
               operator: 'is',
-              value: [urlHash]
+              value: [url]
             }
           ]
         }
@@ -282,8 +280,7 @@ class FeishuBookmarkExtension {
         "关联项目": Array.isArray(bookmarkData.project) ? bookmarkData.project : (bookmarkData.project ? [bookmarkData.project] : []),
         "关联文件": uploadedFiles,
         "创建时间": bookmarkData.createdTime,
-        "最后更新时间": bookmarkData.lastUpdated,
-        "url_hash": urlHash
+        "最后更新时间": bookmarkData.lastUpdated
       }
     };
 
