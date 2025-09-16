@@ -228,7 +228,6 @@ class FeishuBookmarkExtension {
   async checkDuplicate(url) {
     try {
       const response = await this.makeApiCall('POST', '/bitable/v1/apps/{appToken}/tables/{tableId}/records/search', {
-        fields: ['record_id', '网页链接'],
         filter: {
           conjunction: 'and',
           conditions: [
@@ -261,28 +260,31 @@ class FeishuBookmarkExtension {
       }
     }
 
-    const urlHash = await this.generateUrlHash(bookmarkData.url);
     console.log('[DEBUG] 生成的字段数据:', {
       url: bookmarkData.url,
       title: bookmarkData.title,
       notes: bookmarkData.notes,
       tags: bookmarkData.tags,
-      project: bookmarkData.project,
-      urlHash
+      project: bookmarkData.project
     });
 
-    const record = {
-      fields: {
-        "网页链接": bookmarkData.url,
-        "网站标题": bookmarkData.title,
-        "备注": bookmarkData.notes || '',
-        "分类标签": bookmarkData.tags || [],
-        "关联项目": Array.isArray(bookmarkData.project) ? bookmarkData.project : (bookmarkData.project ? [bookmarkData.project] : []),
-        "关联文件": uploadedFiles,
-        "创建时间": bookmarkData.createdTime,
-        "最后更新时间": bookmarkData.lastUpdated
-      }
-    };
+    const fields = {};
+    
+    // 只添加有值的字段
+    if (bookmarkData.url) fields["网页链接"] = bookmarkData.url;
+    if (bookmarkData.title) fields["网站标题"] = bookmarkData.title;
+    if (bookmarkData.notes) fields["备注"] = bookmarkData.notes;
+    if (bookmarkData.tags && bookmarkData.tags.length > 0) fields["分类标签"] = bookmarkData.tags;
+    if (bookmarkData.project && bookmarkData.project.length > 0) {
+      fields["关联项目"] = Array.isArray(bookmarkData.project) ? bookmarkData.project : [bookmarkData.project];
+    }
+    if (uploadedFiles && uploadedFiles.length > 0) fields["关联文件"] = uploadedFiles;
+    if (bookmarkData.createdTime) fields["创建时间"] = bookmarkData.createdTime;
+    if (bookmarkData.lastUpdated) fields["最后更新时间"] = bookmarkData.lastUpdated;
+
+    const record = { fields };
+    
+    console.log('[DEBUG] 最终记录数据:', record);
 
     const response = await this.makeApiCall('POST', '/bitable/v1/apps/{appToken}/tables/{tableId}/records', {
       records: [record]
@@ -457,10 +459,12 @@ class FeishuBookmarkExtension {
       }
 
       const searchParams = {
-        fields: ['record_id', '网页链接', '网站标题', '备注', '分类标签', '关联项目', '创建时间', '最后更新时间'],
-        page_size: pageSize,
-        page_token: page > 1 ? ((page - 1) * pageSize).toString() : undefined
+        page_size: pageSize
       };
+
+      if (page > 1) {
+        searchParams.page_token = ((page - 1) * pageSize).toString();
+      }
 
       if (conditions.length > 0) {
         searchParams.filter = { conjunction: 'and', conditions };
